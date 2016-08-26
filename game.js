@@ -30,6 +30,8 @@ var game = {
   },
   'exit': function(){
     clearInterval(this.interval);
+    window.removeEventListener('keydown', this.keydownlistener);
+    window.removeEventListener('keyup', this.keyuplistener);
     this.looping = false;
   },
   'loop': function(){
@@ -45,11 +47,24 @@ var game = {
     this.last_frame = this.start_time;
     this.load_assets();
     this.reset();
-    this.interval = setInterval((function(self){
+    this.intervallistener = (function(self){
       return function(){
         self.one_loop();
       }
-    })(this), 1000 / this.fps);
+    })(this)
+    this.interval = setInterval(this.intervallistener, 1000 / this.fps);
+    this.keydownlistener = (function(self){
+      return function(e){
+        self.keydown(e);
+      }
+    })(this);
+    this.keyuplistener = (function(self){
+      return function(e){
+        self.keyup(e);
+      }
+    })(this);
+    window.addEventListener('keydown', this.keydownlistener);
+    window.addEventListener('keyup', this.keyuplistener);
   },
   'one_loop': function(){
     if(this.paused){
@@ -70,6 +85,12 @@ var game = {
   'reset': function(){
     this.frame = 0;
     this.flipped = false;
+  },
+  'keydown': function(e){
+    console.log('down', e);
+  },
+  'keyup': function(e){
+    console.log('up', e);
   },
   'update': function(){
     this.frame += this.frame_time * this.width / 2 / 5000;
