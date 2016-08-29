@@ -17,7 +17,7 @@ var game = {
   'canvas': false,
   'width': 600,
   'height': 400,
-  'fps': 40,
+  'fps': 4,
   'start_time': 0,
   'last_frame': 0,
   'total_time': 0,
@@ -85,12 +85,50 @@ var game = {
   'reset': function(){
     this.frame = 0;
     this.flipped = false;
+    this.gridx = 12;
+    this.gridy = 8;
+    this.cur_x = 0;
+    this.cur_y = 0;
   },
   'keydown': function(e){
-    console.log('down', e);
+    //console.log('down', e);
+    if(!this.paused){
+      e.preventDefault();
+    }
   },
   'keyup': function(e){
-    console.log('up', e);
+    //console.log('up', e);
+    switch (e.key) {
+      case 'a':
+      case 'ArrowLeft':
+        if(this.cur_x > 0){
+          this.cur_x--;
+        }
+        break;
+      case 'd':
+      case 'ArrowRight':
+        if(this.cur_x < this.gridx){
+          this.cur_x++;
+        }
+        break;
+      case 'w':
+      case 'ArrowUp':
+        if(this.cur_y > 0){
+          this.cur_y--;
+        }
+        break;
+      case 's':
+      case 'ArrowDown':
+        if(this.cur_y < this.gridy){
+          this.cur_y++;
+        }
+        break;
+      default:
+        console.log('up', e.key);
+    }
+    if(!this.paused){
+      e.preventDefault();
+    }
   },
   'update': function(){
     this.frame += this.frame_time * this.width / 2 / 5000;
@@ -101,6 +139,29 @@ var game = {
   },
   'draw': function(){
     var ctx = this.canvas.getContext('2d');
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, this.width, this.height);
+
+    // grid
+    ctx.strokeStyle = '#FFFFFF';
+    var gridwidth = this.width / (this.gridx + 1);
+    var gridheight = this.height / (this.gridy + 1);
+    for(var i = 1; i <= this.gridx; i++){
+      var x = i * gridwidth;
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, this.height);
+    }
+    for(var i = 1; i <= this.gridy; i++){
+      var y = i * gridheight;
+      ctx.moveTo(0, y);
+      ctx.lineTo(this.width, y);
+    }
+    ctx.stroke();
+
+    // current
+    ctx.strokeStyle = '#FF0000';
+    ctx.strokeRect(this.cur_x * gridwidth, this.cur_y * gridheight, gridwidth, gridheight);
+    /*
     ctx.fillStyle = this.flipped ? '#FF0000' : '#000000';
     ctx.fillRect(0, 0, 600, 400);
     ctx.fillStyle = this.flipped ? '#000000' : '#FF0000';
@@ -114,5 +175,6 @@ var game = {
     ctx.font = '30px Arial';
     ctx.fillText("Hi", this.width - 50, this.height / 2 + 15);
     ctx.drawImage(this.img1, (this.width - this.img1.width) / 2, (this.height - this.img1.height) / 2);
+    */
   }
 }
