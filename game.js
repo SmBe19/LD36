@@ -33,6 +33,9 @@ var game = {
     window.removeEventListener('keydown', this.keydownlistener);
     window.removeEventListener('keyup', this.keyuplistener);
     this.looping = false;
+    var ctx = this.canvas.getContext('2d');
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, this.width, this.height);
   },
   'loop': function(){
     if(this.looping){
@@ -89,15 +92,30 @@ var game = {
     this.gridy = 8;
     this.cur_x = 0;
     this.cur_y = 0;
+    this.field = [];
+    for(var y = 0; y <= this.gridy; y++){
+      this.field.push([]);
+      for(var x = 0; x <= this.gridx; x++){
+        this.field[y].push(0);
+      }
+    }
   },
   'keydown': function(e){
     //console.log('down', e);
-    if(!this.paused){
-      e.preventDefault();
+    if(this.paused){
+      return;
     }
+    e.preventDefault();
   },
   'keyup': function(e){
     //console.log('up', e);
+    if(e.key == 'p'){
+      this.toggle_pause();
+      return;
+    }
+    if(this.paused){
+      return;
+    }
     switch (e.key) {
       case 'a':
       case 'ArrowLeft':
@@ -123,12 +141,22 @@ var game = {
           this.cur_y++;
         }
         break;
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        this.field[this.cur_y][this.cur_x] = e.key|0;
+        break;
       default:
         console.log('up', e.key);
     }
-    if(!this.paused){
-      e.preventDefault();
-    }
+    e.preventDefault();
   },
   'update': function(){
     this.frame += this.frame_time * this.width / 2 / 5000;
@@ -157,6 +185,16 @@ var game = {
       ctx.lineTo(this.width, y);
     }
     ctx.stroke();
+
+    ctx.font = '30px Arial';
+    ctx.fillStyle = '#FFFFFF'
+    for(var y = 0; y <= this.gridy; y++){
+      for(var x = 0; x <= this.gridx; x++){
+        if(this.field[y][x] != 0){
+          ctx.fillText(this.field[y][x], (x+0.3) * gridwidth, (y+0.7) * gridheight);
+        }
+      }
+    }
 
     // current
     ctx.strokeStyle = '#FF0000';
